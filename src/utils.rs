@@ -1,6 +1,7 @@
 use crate::consts::*;
 use rand::{distributions::Alphanumeric, Rng, RngCore};
 
+#[cfg(feature = "wee_alloc")]
 extern crate wee_alloc;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
