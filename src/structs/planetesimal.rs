@@ -53,6 +53,8 @@ pub struct Planetesimal {
     pub surface_temp_kelvin: f64,
     pub day_temp_kelvin: f64,
     pub night_temp_kelvin: f64,
+    pub max_temp_kelvin: f64,
+    pub min_temp_kelvin: f64,
     pub boiling_point_kelvin: f64,
     pub hydrosphere: f64,
     pub cloud_cover: f64,
@@ -78,9 +80,9 @@ impl Planetesimal {
         planetesimal_outer_bound: &f64,
         rng: &mut dyn RngCore,
     ) -> Self {
-        let a = rng.gen_range(*planetesimal_inner_bound..*planetesimal_outer_bound);
+        let a = semi_major_axis(*planetesimal_inner_bound, *planetesimal_outer_bound, rng);
         let e = random_eccentricity(rng);
-        let b = a * (1.0 - e.powf(2.0)).sqrt();
+        let b = semi_minor_axis(a, e);
         let id = random_id(rng);
 
         Planetesimal {
@@ -109,6 +111,8 @@ impl Planetesimal {
             surface_temp_kelvin: 0.0,
             day_temp_kelvin: 0.0,
             night_temp_kelvin: 0.0,
+            max_temp_kelvin: 0.0,
+            min_temp_kelvin: 0.0,
             surface_pressure_bar: 0.0,
             boiling_point_kelvin: 0.0,
             hydrosphere: 0.0,
@@ -205,9 +209,9 @@ impl Planetesimal {
 
         self.hill_sphere = hill_sphere_au(&self.a, &self.e, &self.mass, stellar_mass);
         self.earth_masses = get_earth_mass(self.mass);
-        self.earth_radii = self.radius / EARTH_RADIUS_IN_KM;
+        self.earth_radii = float_to_precision(self.radius / EARTH_RADIUS_IN_KM);
         self.length_of_year = self.orbital_period_days / 365.25;
-        self.escape_velocity_km_per_sec = self.escape_velocity / CM_PER_KM;
+        self.escape_velocity_km_per_sec = float_to_precision(self.escape_velocity / CM_PER_KM);
         self.is_tidally_locked = check_tidal_lock(self.day_hours, self.orbital_period_days);
 
         // Probability of planet have a tectonic activity:
@@ -238,7 +242,7 @@ impl Planetesimal {
     ) -> Self {
         let mut random_body =
             Planetesimal::new(planetesimal_inner_bound, planetesimal_outer_bound, rng);
-        random_body.mass = rng.gen_range(PLANETESIMAL_MASS..PROTOPLANET_MASS * 1.0e5);
+        random_body.mass = float_to_precision(rng.gen_range(PLANETESIMAL_MASS..PROTOPLANET_MASS * 1.0e5));
         random_body.orbit_zone = 3;
         random_body.radius = kothari_radius(
             &random_body.mass,
@@ -278,7 +282,7 @@ impl Planetesimal {
             is_dwarf_planet = true;
         }
         let id = random_id(rng);
-        let b = a * (1.0 - e.powf(2.0)).sqrt();
+        let b = semi_minor_axis(a, e);
 
         let mut random_planet = Planetesimal {
             a,
@@ -306,6 +310,8 @@ impl Planetesimal {
             surface_temp_kelvin: 0.0,
             day_temp_kelvin: 0.0,
             night_temp_kelvin: 0.0,
+            max_temp_kelvin: 0.0,
+            min_temp_kelvin: 0.0,
             surface_pressure_bar: 0.0,
             boiling_point_kelvin: 0.0,
             hydrosphere: 0.0,

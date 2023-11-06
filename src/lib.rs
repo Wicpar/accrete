@@ -28,10 +28,15 @@ pub use structs::System;
 #[cfg(test)]
 mod tests {
     use crate::Accrete;
-    use std::fs;
+    use std::{fs, env};
     use std::io::{Error, Write};
 
-    const GENERATE_FIXTURES: bool = false;
+    fn generate_fixtures_env() -> bool {
+        match env::var("GENERATE_FIXTURES") {
+            Ok(s) => s == "true",
+            _ => false
+        }
+    }
 
     fn write_to_file(data: &str, path: &str) -> Result<(), Error> {
         let mut output = fs::File::create(path)?;
@@ -43,7 +48,7 @@ mod tests {
     }
 
     fn get_fixture(path: &str, accrete: &mut Accrete) -> String {
-        if GENERATE_FIXTURES {
+        if generate_fixtures_env() {
             write_to_file(&format!("{:?}", accrete.planetary_system()), path)
                 .expect("Failed to write fixture");
         }
@@ -53,7 +58,7 @@ mod tests {
 
     #[test]
     fn run_with_default_config() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         let path = "./src/fixtures/default";
         let fixture = get_fixture(path, &mut accrete);
         let system = format!("{:?}", accrete.planetary_system());
@@ -62,7 +67,7 @@ mod tests {
 
     #[test]
     fn run_with_o_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 60.0;
         accrete.planetary_system();
         let path = "./src/fixtures/o_spectral_class";
@@ -73,7 +78,7 @@ mod tests {
 
     #[test]
     fn run_with_b_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 18.0;
         accrete.planetary_system();
         let path = "./src/fixtures/b_spectral_class";
@@ -84,7 +89,7 @@ mod tests {
 
     #[test]
     fn run_with_a_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 2.1;
         accrete.planetary_system();
         let path = "./src/fixtures/a_spectral_class";
@@ -95,7 +100,7 @@ mod tests {
 
     #[test]
     fn run_with_f_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 1.3;
         accrete.planetary_system();
         let path = "./src/fixtures/f_spectral_class";
@@ -106,7 +111,7 @@ mod tests {
 
     #[test]
     fn run_with_g_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 1.0;
         accrete.planetary_system();
         let path = "./src/fixtures/g_spectral_class";
@@ -117,7 +122,7 @@ mod tests {
 
     #[test]
     fn run_with_k_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 0.8;
         accrete.planetary_system();
         let path = "./src/fixtures/k_spectral_class";
@@ -128,7 +133,7 @@ mod tests {
 
     #[test]
     fn run_with_m_spectral_class() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 0.3;
         accrete.planetary_system();
         let path = "./src/fixtures/m_spectral_class";
@@ -139,7 +144,7 @@ mod tests {
 
     #[test]
     fn run_with_brown_dwarf() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 0.1;
         accrete.planetary_system();
         let path = "./src/fixtures/brown_dwarf";
@@ -150,7 +155,7 @@ mod tests {
 
     #[test]
     fn run_with_rogue_planet() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.stellar_mass = 0.0005;
         accrete.planetary_system();
         let path = "./src/fixtures/rogue_planet";
@@ -161,7 +166,7 @@ mod tests {
 
     #[test]
     fn high_density_dust() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.dust_density_coeff = 0.05;
         accrete.planetary_system();
         let path = "./src/fixtures/high_density_dust";
@@ -172,7 +177,7 @@ mod tests {
 
     #[test]
     fn low_density_dust() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.dust_density_coeff = 0.00125;
         accrete.planetary_system();
         let path = "./src/fixtures/low_density_dust";
@@ -183,7 +188,7 @@ mod tests {
 
     #[test]
     fn high_cloud_ecentricity() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.cloud_eccentricity = 0.5;
         accrete.planetary_system();
         let path = "./src/fixtures/high_cloud_ecentricity";
@@ -194,7 +199,7 @@ mod tests {
 
     #[test]
     fn low_cloud_ecentricity() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.cloud_eccentricity = 0.1;
         accrete.planetary_system();
         let path = "./src/fixtures/low_cloud_ecentricity";
@@ -205,7 +210,7 @@ mod tests {
 
     #[test]
     fn low_cloud_ecentricity_and_dust_density() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.cloud_eccentricity = 0.05;
         accrete.dust_density_coeff = 0.035;
         accrete.planetary_system();
@@ -217,10 +222,10 @@ mod tests {
 
     #[test]
     fn random_planet_default() {
-        let mut accrete = Accrete::new(Default::default());
+        let mut accrete = Accrete::new(1);
         accrete.planet();
         let path = "./src/fixtures/random_planet_default";
-        if GENERATE_FIXTURES {
+        if generate_fixtures_env() {
             write_to_file(&format!("{:?}", accrete.planet()), path)
                 .expect("Failed to write fixture");
         }
