@@ -1,5 +1,6 @@
 use crate::consts::*;
 use crate::enviro::*;
+#[cfg(events_log)]
 use crate::events_log::accrete_event::AccreteEvents;
 use crate::structs::*;
 use crate::utils::*;
@@ -256,6 +257,7 @@ impl Planetesimal {
         mass: f64,
         post_accretion_intensity: u32,
         rng: &mut dyn RngCore,
+        #[cfg(events_log)]
         events_log: &mut AccreteEvents,
     ) -> Planetesimal {
         let main_seq_age = main_sequence_age(stellar_mass, stellar_luminosity);
@@ -336,6 +338,7 @@ impl Planetesimal {
                 &stellar_luminosity,
                 &stellar_mass,
                 rng,
+                #[cfg(events_log)]
                 events_log,
             );
         }

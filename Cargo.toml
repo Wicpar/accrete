@@ -14,6 +14,7 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 wasm = ["console_error_panic_hook", "wee_alloc"]
+events_log = []
 
 [dependencies]
 rand = "0.8.3"

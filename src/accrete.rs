@@ -1,5 +1,7 @@
 use crate::consts::*;
+#[cfg(events_log)]
 use crate::events_log::accrete_event::AccreteEvents;
+#[cfg(events_log)]
 use crate::events_log::event_source::EventSource;
 use crate::structs::planetesimal::Planetesimal;
 use crate::structs::system::System;
@@ -56,8 +58,9 @@ pub struct Accrete {
     pub planet_e: f64,
     pub planet_mass: f64,
     pub stellar_luminosity: f64,
+    #[cfg(events_log)]
     pub events_log: AccreteEvents,
-    rng: ChaCha8Rng,
+    pub rng: ChaCha8Rng,
 }
 
 impl Default for Accrete {
@@ -81,6 +84,7 @@ impl Default for Accrete {
             planet_e,
             planet_mass,
             rng,
+            #[cfg(events_log)]
             events_log: vec![],
         }
     }
@@ -107,12 +111,14 @@ impl Accrete {
             planet_e,
             planet_mass,
             rng,
+            #[cfg(events_log)]
             events_log: vec![],
         }
     }
 
     /// Generate planetary system.
     pub fn planetary_system(&mut self) -> System {
+        #[cfg(events_log)]
         let Accrete {
             stellar_mass,
             dust_density_coeff,
@@ -121,7 +127,19 @@ impl Accrete {
             b,
             post_accretion_intensity,
             rng,
+
             events_log,
+            ..
+        } = self;
+        #[cfg(not(events_log))]
+        let Accrete {
+            stellar_mass,
+            dust_density_coeff,
+            k,
+            cloud_eccentricity,
+            b,
+            post_accretion_intensity,
+            rng,
             ..
         } = self;
 
@@ -133,21 +151,26 @@ impl Accrete {
             *b,
         );
 
+        #[cfg(events_log)]
         planetary_system.event("system_setup", events_log);
 
-        planetary_system.distribute_planetary_masses(rng, events_log);
-        planetary_system.post_accretion(*post_accretion_intensity, rng, events_log);
+        planetary_system.distribute_planetary_masses(rng, #[cfg(events_log)]events_log);
+        planetary_system.post_accretion(*post_accretion_intensity, rng, #[cfg(events_log)]events_log);
         planetary_system.process_planets(rng);
 
+        #[cfg(events_log)]
         planetary_system.event("planetary_environment_generated", events_log);
 
+        #[cfg(events_log)]
         planetary_system.event("system_complete", events_log);
 
         planetary_system
     }
 
+
     /// Generate planet.
     pub fn planet(&mut self) -> Planetesimal {
+        #[cfg(events_log)]
         let Accrete {
             stellar_mass,
             stellar_luminosity,
@@ -159,6 +182,17 @@ impl Accrete {
             events_log,
             ..
         } = self;
+        #[cfg(not(events_log))]
+        let Accrete {
+            stellar_mass,
+            stellar_luminosity,
+            planet_a,
+            planet_e,
+            planet_mass,
+            post_accretion_intensity,
+            rng,
+            ..
+        } = self;
 
         Planetesimal::random_planet(
             *stellar_luminosity,
@@ -168,7 +202,9 @@ impl Accrete {
             *planet_mass,
             *post_accretion_intensity,
             rng,
+            #[cfg(events_log)]
             events_log,
         )
     }
+
 }

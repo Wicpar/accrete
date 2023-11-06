@@ -11,6 +11,8 @@
 pub mod accrete;
 pub mod consts;
 pub mod enviro;
+
+#[cfg(events_log)]
 pub mod events_log;
 pub mod structs;
 pub mod utils;
